@@ -11,7 +11,7 @@ def loadCSV(file_path, delimiter=','):
     reader = csv.DictReader(f, delimiter=delimiter)
     return reader.fieldnames, list(reader)
 
-def findBest(csv, csv_column_name, row, row_column_name):
+def findBest(csv, csv_column_name, row, row_column_name, should_revalidate):
     filter = re.compile(r'(\s|-|\.|\+)+').split(row[row_column_name])
 
     csv_data = [csv_data for csv_data in csv if set(csv_data[csv_column_name].split(' ')).intersection(filter)]
@@ -41,9 +41,9 @@ def findBest(csv, csv_column_name, row, row_column_name):
         if count > 1:
             result.append(n)
 
-    if len(best_match) > 0 and len(result) == 0:
+    if should_revalidate and len(best_match) > 0 and len(result) == 0:
         print 'Is this correct?\n Is %s => %s'%(best_match[0][csv_column_name], row[row_column_name])
-        add = raw_input('Should this be added Y/N? [N]') or 'n'
+        add = raw_input('Should this be added Y/N? [N] ') or 'n'
         if add.lower() == 'y':
             return [best_match[0]]
 
@@ -69,7 +69,7 @@ def mapCsvs(
     df = pd.DataFrame(columns = columns)
 
     for row in csv2:
-        best_csv = findBest(csv1, csv1_column_name, row, csv2_column_name)
+        best_csv = findBest(csv1, csv1_column_name, row, csv2_column_name, True)
 
         csv2_data = {}
         for p in csv2_fieldnames:
@@ -98,7 +98,7 @@ def mapCsvs(
                 df = df.append(data, ignore_index=True)
 
     for row in csv1:
-        best_csv = findBest(csv2, csv2_column_name, row, csv1_column_name)
+        best_csv = findBest(csv2, csv2_column_name, row, csv1_column_name, False)
 
         if len(best_csv) == 0:
             csv_data = {}
