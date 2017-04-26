@@ -12,7 +12,8 @@ def loadCSV(file_path, delimiter=','):
     return reader.fieldnames, list(reader)
 
 def findBest(csv, csv_column_name, row, row_column_name):
-    filter = row[row_column_name].split(' ')
+    filter = re.compile(r'(\s|-|\.|\+)+').split(row[row_column_name])
+
     csv_data = [csv_data for csv_data in csv if set(csv_data[csv_column_name].split(' ')).intersection(filter)]
     data = [data for data in csv if set(data[csv_column_name].split(' ')).intersection(filter)]
 
@@ -27,9 +28,8 @@ def findBest(csv, csv_column_name, row, row_column_name):
         best_match = data
 
     result = []
-
     for n in best_match:
-        split = n[csv_column_name].split(' ')
+        split = re.compile(r'(\s|-|\.|\+)+').split(n[csv_column_name])
         count = 0
         if not split[0].lower() == filter[0].lower():
             continue
@@ -41,6 +41,11 @@ def findBest(csv, csv_column_name, row, row_column_name):
         if count > 1:
             result.append(n)
 
+    if len(best_match) > 0 and len(result) == 0:
+        print 'Is this correct?\n Is %s => %s'%(best_match[0][csv_column_name], row[row_column_name])
+        add = raw_input('Should this be added Y/N? [N]') or 'n'
+        if add.lower() == 'y':
+            return [best_match[0]]
 
     return result
 
