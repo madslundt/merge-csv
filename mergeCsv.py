@@ -16,7 +16,7 @@ def findBest(csv, csv_column_name, row, row_column_name):
     csv_data = [csv_data for csv_data in csv if set(csv_data[csv_column_name].split(' ')).intersection(filter)]
     data = [data for data in csv if set(data[csv_column_name].split(' ')).intersection(filter)]
 
-    best_match = None
+    best_match = []
     if len(data) > 1:
         data_names = [p[csv_column_name] for p in data]
         best_data_name = sorted(data_names, key=lambda x: difflib.SequenceMatcher(None, x, row[row_column_name]).ratio(), reverse=True)
@@ -26,7 +26,23 @@ def findBest(csv, csv_column_name, row, row_column_name):
     elif len(data) == 1:
         best_match = data
 
-    return best_match
+    result = []
+
+    for n in best_match:
+        split = n[csv_column_name].split(' ')
+        count = 0
+        if not split[0].lower() == filter[0].lower():
+            continue
+
+        for s in split:
+            for name in filter:
+                if name.lower() == s.lower():
+                    count += 1
+        if count > 1:
+            result.append(n)
+
+
+    return result
 
 def mapCsvs(
     csv1_path,
@@ -52,12 +68,12 @@ def mapCsvs(
 
         csv2_data = {}
         for p in csv2_fieldnames:
-            if best_csv == None and p == csv2_column_name:
+            if len(best_csv) == 0 and p == csv2_column_name:
                 csv2_data[csv1_column_name] = row.get(p)
             elif not p == csv2_column_name:
                 csv2_data[p] = row.get(p, 0)
 
-        if best_csv == None:
+        if len(best_csv) == 0:
             print('%s has no %s: %s'%(csv2_column_name, csv1_column_name, row[csv2_column_name]))
             csv1_data = {}
             for p in csv1_fieldnames:
@@ -79,9 +95,7 @@ def mapCsvs(
     for row in csv1:
         best_csv = findBest(csv2, csv2_column_name, row, csv1_column_name)
 
-        if best_csv == None:
-            print('%s has no %s: %s'%(csv1_column_name, csv2_column_name, row[csv1_column_name]))
-
+        if len(best_csv) == 0:
             csv_data = {}
             for p in csv2_fieldnames:
                 if not p == csv2_column_name:
