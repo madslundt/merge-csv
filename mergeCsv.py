@@ -76,13 +76,13 @@ def mapCsvs(
             if len(best_csv) == 0 and p == csv2_column_name:
                 csv2_data[csv1_column_name] = row.get(p)
             elif not p == csv2_column_name:
-                csv2_data[p] = row.get(p, 0)
+                csv2_data[p] = row.get(p, '0')
 
         if len(best_csv) == 0:
             print('%s has no %s: %s'%(csv2_column_name, csv1_column_name, row[csv2_column_name]))
             csv1_data = {}
             for p in csv1_fieldnames:
-                csv1_data[p] = 0
+                csv1_data[p] = '0'
 
             data = dict(csv1_data)
             data.update(csv2_data)
@@ -104,7 +104,7 @@ def mapCsvs(
             csv_data = {}
             for p in csv2_fieldnames:
                 if not p == csv2_column_name:
-                    csv_data[p] = 0
+                    csv_data[p] = '0'
 
             data = row
             data.update(csv_data)
