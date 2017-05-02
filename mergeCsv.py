@@ -12,7 +12,7 @@ def loadCSV(file_path, delimiter=','):
     return reader.fieldnames, list(reader)
 
 def findBest(csv, csv_column_name, row, row_column_name, should_revalidate):
-    filter = re.compile(r'(\s|-|\.|\+)+').split(row[row_column_name])
+    filter = re.compile(r'[\s|\-|\_|\.|\+]+').split(row[row_column_name])
 
     csv_data = [csv_data for csv_data in csv if set(csv_data[csv_column_name].split(' ')).intersection(filter)]
     data = [data for data in csv if set(data[csv_column_name].split(' ')).intersection(filter)]
@@ -29,7 +29,7 @@ def findBest(csv, csv_column_name, row, row_column_name, should_revalidate):
 
     result = []
     for n in best_match:
-        split = re.compile(r'(\s|-|\.|\+)+').split(n[csv_column_name])
+        split = re.compile(r'[\s|\-|\_|\.|\+]+').split(n[csv_column_name])
         count = 0
         if not split[0].lower() == filter[0].lower():
             continue
